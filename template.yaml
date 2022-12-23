@@ -52,6 +52,40 @@ Resources:
                         Path: /libraryItems
                         Method: post
 
+    patchLibraryItemFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: src/handlers/music-library.patchLibraryItem
+            Runtime: nodejs12.x
+            MemorySize: 128
+            Timeout: 100
+            Description: Lambda for modifying an existing library item.
+            Policies:
+                - AWSLambdaBasicExecutionRole
+            Events:
+                PatchLibraryItem:
+                    Type: Api
+                    Properties:
+                        Path: /libraryItems/{itemId}
+                        Method: patch
+
+    getLibraryItemFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: src/handlers/music-library.getLibraryItem
+            Runtime: nodejs12.x
+            MemorySize: 128
+            Timeout: 100
+            Description: Lambda for retrieving a library item.
+            Policies:
+                - AWSLambdaBasicExecutionRole
+            Events:
+                GetLibraryItem:
+                    Type: Api
+                    Properties:
+                        Path: /libraryItems/{itemId}
+                        Method: get
+
     MusicLibraryTable:
         Type: AWS::DynamoDB::Table
         Properties:
