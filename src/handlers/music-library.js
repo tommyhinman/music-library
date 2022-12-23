@@ -15,7 +15,8 @@ const getSuccessResponse = (data) => {
         headers: {
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PATCH",
+            "content-type": "application/json",
         },
         body: body,
     }
@@ -57,22 +58,35 @@ exports.createLibraryItem = async (data) => {
 exports.patchLibraryItem = async (data) => {
     console.log("Patch library item with data: " + JSON.stringify(data))
     const requestBody = JSON.parse(data.body)
-    const { updateExpression, expressionAttributeValues } = Object.keys(
-        requestBody
-    ).reduce(
-        (acc, fieldName) => {
-            acc.updateExpression += fieldName + " = " + ":" + fieldName + "V "
-            acc.expressionAttributeValues[":" + fieldName + "V"] =
-                requestBody[fieldName]
-            return acc
-        },
-        {
-            updateExpression: "set ",
-            expressionAttributeValues: {},
-        }
-    )
-
+    const { updateExpressionComponents, expressionAttributeValues } =
+        Object.keys(requestBody)
+            .filter((fieldName) => requestBody[fieldName] != "")
+            .filter((fieldName) => fieldName != "itemId")
+            .reduce(
+                (acc, fieldName) => {
+                    acc.updateExpressionComponents.push(
+                        fieldName + " = " + ":" + fieldName + "V"
+                    )
+                    acc.expressionAttributeValues[":" + fieldName + "V"] =
+                        requestBody[fieldName]
+                    return acc
+                },
+                {
+                    updateExpressionComponents: [],
+                    expressionAttributeValues: {},
+                }
+            )
     const itemId = data.pathParameters.itemId
+    const updateExpression = "set " + updateExpressionComponents.join(",")
+
+    console.log(
+        "Updating item with ID " +
+            itemId +
+            ", update expression: " +
+            updateExpression +
+            ", attributes: " +
+            JSON.stringify(expressionAttributeValues)
+    )
 
     const params = {
         TableName: TABLE_NAME,

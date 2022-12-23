@@ -104,3 +104,12 @@ Outputs:
     getLibraryItemsFunction:
         Description: "Get Library Items Lambda Function ARN"
         Value: !GetAtt getLibraryItemsFunction.Arn
+
+Globals:
+    Api:
+        Cors:
+            AllowMethods: "'GET,POST,PATCH,OPTIONS'"
+            AllowHeaders: "'content-type'"
+            AllowOrigin: "'*'"
+        Auth:
+            AddDefaultAuthorizerToCorsPreflight: false
